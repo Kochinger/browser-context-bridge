@@ -1,0 +1,11 @@
+.git/**
+.gitignore
+.github/**
+node_modules/**
+src/**
+test/**
+scripts/**
+.test-dist/**
+tsconfig.json
+esbuild.mjs
+**/*.map

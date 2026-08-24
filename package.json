@@ -1,0 +1,242 @@
+{
+  "name": "browser-context-bridge",
+  "displayName": "Browser Context Bridge",
+  "description": "Send context from VS Code's integrated browser to Codex or Claude Code.",
+  "version": "0.11.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "activationEvents": [
+    "onCommand:browserContextBridge.captureElementToClaude",
+    "onCommand:browserContextBridge.captureElementToCodex",
+    "onCommand:browserContextBridge.captureElement",
+    "onCommand:browserContextBridge.captureArea",
+    "onCommand:browserContextBridge.captureScreenshot",
+    "onCommand:browserContextBridge.capturePage",
+    "onCommand:browserContextBridge.chooseTarget",
+    "onCommand:browserContextBridge.selectPage",
+    "onCommand:browserContextBridge.sendLatest",
+    "onCommand:browserContextBridge.showLatest",
+    "onCommand:browserContextBridge.clearCaptures",
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "enabledApiProposals": [
+    "browser"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "browserContextBridge.captureElementToClaude",
+        "title": "Capture Element for Claude Code",
+        "category": "Browser Context Bridge",
+        "icon": {
+          "light": "media/pick-claude-light.svg",
+          "dark": "media/pick-claude-dark.svg"
+        }
+      },
+      {
+        "command": "browserContextBridge.captureElementToCodex",
+        "title": "Capture Element for Codex",
+        "category": "Browser Context Bridge",
+        "icon": {
+          "light": "media/pick-codex-light.svg",
+          "dark": "media/pick-codex-dark.svg"
+        }
+      },
+      {
+        "command": "browserContextBridge.captureElement",
+        "title": "Select and Capture Element",
+        "category": "Browser Context Bridge",
+        "icon": "$(inspect)"
+      },
+      {
+        "command": "browserContextBridge.captureArea",
+        "title": "Select and Capture Area",
+        "category": "Browser Context Bridge",
+        "icon": "$(screen-full)"
+      },
+      {
+        "command": "browserContextBridge.captureScreenshot",
+        "title": "Capture Viewport Screenshot",
+        "category": "Browser Context Bridge",
+        "icon": "$(device-camera)"
+      },
+      {
+        "command": "browserContextBridge.capturePage",
+        "title": "Capture Page Context",
+        "category": "Browser Context Bridge",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "browserContextBridge.chooseTarget",
+        "title": "Send Captures To…",
+        "category": "Browser Context Bridge",
+        "icon": "$(send)"
+      },
+      {
+        "command": "browserContextBridge.selectPage",
+        "title": "Choose Browser Page…",
+        "category": "Browser Context Bridge",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "browserContextBridge.sendLatest",
+        "title": "Send Latest Context to…",
+        "category": "Browser Context Bridge",
+        "icon": "$(send)"
+      },
+      {
+        "command": "browserContextBridge.showLatest",
+        "title": "Open Latest Context",
+        "category": "Browser Context Bridge",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "browserContextBridge.clearCaptures",
+        "title": "Clear Captured Context",
+        "category": "Browser Context Bridge",
+        "icon": "$(trash)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "browserContextBridge.captureElementToClaude",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "navigation@90"
+        },
+        {
+          "command": "browserContextBridge.captureElementToCodex",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "navigation@91"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "browserContextBridge.captureElement",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "1_capture@1"
+        },
+        {
+          "command": "browserContextBridge.captureArea",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "1_capture@2"
+        },
+        {
+          "command": "browserContextBridge.captureScreenshot",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "1_capture@3"
+        },
+        {
+          "command": "browserContextBridge.capturePage",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "1_capture@4"
+        },
+        {
+          "command": "browserContextBridge.chooseTarget",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "2_target@1"
+        },
+        {
+          "command": "browserContextBridge.selectPage",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "2_target@2"
+        },
+        {
+          "command": "browserContextBridge.sendLatest",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "3_latest@1"
+        },
+        {
+          "command": "browserContextBridge.showLatest",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "3_latest@2"
+        },
+        {
+          "command": "browserContextBridge.clearCaptures",
+          "when": "activeEditor == workbench.editor.browser",
+          "group": "9_manage@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Browser Context Bridge",
+      "properties": {
+        "browserContextBridge.pageUrl": {
+          "type": "string",
+          "default": "",
+          "description": "URL captured without asking. Leave empty to be prompted the first time; either way the resolved page is remembered and follows navigation in that tab."
+        },
+        "browserContextBridge.target": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "ask",
+            "claude",
+            "codex",
+            "clipboard"
+          ],
+          "enumDescriptions": [
+            "Send to the first installed agent without asking (Claude Code, else Codex, else clipboard).",
+            "Ask after every capture.",
+            "Always insert the capture into Claude Code.",
+            "Always attach the capture to the current Codex thread.",
+            "Always copy file references to the clipboard."
+          ],
+          "default": "auto",
+          "description": "Where newly captured browser context is sent. The default never interrupts; pick “ask” only if you want the prompt back."
+        },
+        "browserContextBridge.artifactDirectory": {
+          "type": "string",
+          "default": ".vscode/browser-context",
+          "description": "Workspace-relative directory for generated context files."
+        },
+        "browserContextBridge.retention": {
+          "type": "string",
+          "enum": [
+            "session",
+            "forever"
+          ],
+          "enumDescriptions": [
+            "Remove captures left over from earlier runs of VS Code when it starts. Captures made in the current session are kept.",
+            "Never remove captures automatically; use “Clear Captured Context”."
+          ],
+          "default": "session",
+          "markdownDescription": "How long captures are kept. `session` sweeps leftovers at startup rather than on shutdown, so a crash or force quit still gets cleaned up. Captures younger than 12 hours are never swept, so reloading the window cannot delete work an open chat still references."
+        },
+        "browserContextBridge.maxTextLength": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 10000,
+          "maximum": 1000000,
+          "description": "Maximum number of characters retained for page, HTML, and CSS context."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "node scripts/run-integration.mjs",
+    "package": "npm run check && npm run test && npm run build",
+    "vsix": "npm run package && vsce package --no-dependencies --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.109.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
